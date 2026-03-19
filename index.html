@@ -984,7 +984,7 @@
                 <div>goldmine-data.com · 888-739-1128</div>
             </div>
             <div class="hdr-right">
-                <div class="badge">— events</div>
+                <div class="badge" id="badge">— events</div>
                 <div class="badge" id="tier-badge" title="Click to log out" style="cursor: pointer;">Tier 1</div>
             </div>
         </header>
@@ -997,19 +997,19 @@
             <div class="crow">
                 <div class="fld" style="min-width: 120px;">
                     <label>Start Date</label>
-                    <input type="date" id="start-date">
+                    <input type="date" id="startDate">
                 </div>
                 <div class="fld" style="min-width: 120px;">
                     <label>End Date</label>
-                    <input type="date" id="end-date">
+                    <input type="date" id="endDate">
                 </div>
                 <div class="fld" style="min-width: 90px;">
                     <label>Min Hail</label>
-                    <input type="number" id="min-hail" value="1" min="0.25" step="0.25">
+                    <input type="number" id="minHail" value="1" min="0.25" step="0.25">
                 </div>
                 <div class="fld" style="min-width: 110px;">
                     <label>State</label>
-                    <select id="state-select">
+                    <select id="stateFilter">
                         <option>All States</option>
                         <option>AL</option>
                         <option>AR</option>
@@ -1046,49 +1046,49 @@
                 </div>
                 <div class="fld" style="min-width: 110px;">
                     <label>Event Type</label>
-                    <select id="event-type">
-                        <option>Hail</option>
-                        <option>Wind</option>
-                        <option>Tornado</option>
+                    <select id="eventType">
+                        <option value="hail">Hail</option>
+                        <option value="wind">Wind</option>
+                        <option value="tornado">Tornado</option>
                     </select>
                 </div>
                 <div class="fld" style="min-width: 110px;">
                     <label>Zip Code</label>
-                    <input type="text" placeholder="e.g. 73301">
+                    <input type="text" id="zipCode" placeholder="e.g. 73301">
                 </div>
                 <div class="fld" style="min-width: 110px;">
                     <label>Radius</label>
-                    <select>
-                        <option>None</option>
-                        <option>25mi</option>
-                        <option>50mi</option>
-                        <option>75mi</option>
-                        <option>100mi</option>
-                        <option>150mi</option>
+                    <select id="radius">
+                        <option value="">None</option>
+                        <option value="25">25mi</option>
+                        <option value="50">50mi</option>
+                        <option value="75">75mi</option>
+                        <option value="100">100mi</option>
+                        <option value="150">150mi</option>
                     </select>
                 </div>
             </div>
             <div class="crow">
                 <div class="fld" style="flex: 1;">
                     <label>Search City/County</label>
-                    <input type="text" placeholder="Filter table...">
+                    <input type="text" id="qsearch" placeholder="Filter table...">
                 </div>
                 <button class="btn btn-green" id="update-btn">⚡ UPDATE</button>
                 <button class="btn btn-orange" id="reset-btn">↺ RESET</button>
-                <button class="btn btn-ins">🛡 Ins+</button>
-                <button class="btn btn-ghost">⬇ CSV</button>
+                <button class="btn btn-ins" id="btn-melissa">🛡 Ins+</button>
+                <button class="btn btn-ghost" onclick="exportCSV()">⬇ CSV</button>
                 <button class="btn btn-pdf">📄 Report</button>
                 <button class="btn btn-canvass" id="canvass-btn">🚪 Canvass</button>
-                <button class="btn btn-circle">⭕ Circle</button>
-                <button class="btn btn-circle">▭ Rect</button>
-                <button class="btn btn-clear">✕ Clear</button>
+                <button class="btn btn-circle" id="btn-draw-circle">⭕ Circle</button>
+                <button class="btn btn-circle" id="btn-draw-rect">▭ Rect</button>
+                <button class="btn btn-clear" id="btn-draw-clear">✕ Clear</button>
             </div>
         </div>
 
         <!-- Mobile Tabs -->
         <div id="mobile-tabs">
-            <button class="btn btn-ghost active">🗺 Map</button>
-            <button class="btn btn-ghost">📋 Data</button>
+            <button class="btn btn-ghost tab-active" id="tab-map" onclick="mobileTab('map')">🗺 Map</button>
+            <button class="btn btn-ghost" id="tab-data" onclick="mobileTab('data')">📋 Data</button>
         </div>
 
         <!-- Main Area -->
@@ -1096,6 +1096,14 @@
             <!-- Map Area -->
             <div id="map-wrap">
                 <div id="map"></div>
+                <div id="info-box" style="display: none;">
+                    <button id="ib-close" style="position: absolute; top: 6px; right: 6px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 18px;">×</button>
+                    <div style="font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1px; margin-bottom: 6px;">STORM EVENT</div>
+                    <div id="ib-city" style="font-size: 13px; color: var(--text); font-weight: 600; margin-bottom: 3px;">Arlington, TX</div>
+                    <div id="ib-sub" style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Tarrant County · 03/15/2024</div>
+                    <div id="ib-size" style="font-size: 12px; color: var(--orange); font-weight: 600; margin-bottom: 3px;">1.75" Insurance Claim ✓</div>
+                    <div id="ib-ago" style="font-size: 10px; color: var(--accent);">1d ago 🔥</div>
+                </div>
                 <div class="legend">
                     <div class="leg-item">
                         <div class="leg-dot" style="background: #22c55e;"></div>
@@ -1135,15 +1143,15 @@
                 <!-- Stats -->
                 <div class="stats">
                     <div class="stat">
-                        <div class="stat-v" id="stat-events">—</div>
+                        <div class="stat-v" id="sv-total">—</div>
                         <div class="stat-l">Events</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-v" id="stat-max-hail">—</div>
+                        <div class="stat-v" id="sv-max">—</div>
                         <div class="stat-l">Max Hail</div>
                     </div>
                     <div class="stat">
-                        <div class="stat-v" id="stat-ins">—</div>
+                        <div class="stat-v" id="sv-ins">—</div>
                         <div class="stat-l">Ins. 1.75″+</div>
                     </div>
                 </div>
@@ -1168,7 +1176,7 @@
                                     <th>Zip</th>
                                 </tr>
                             </thead>
-                            <tbody id="storm-table">
+                            <tbody id="tbody">
                                 <tr class="erow row-1">
                                     <td>03/15/2024</td>
                                     <td>Arlington</td>
@@ -1231,7 +1239,7 @@
                 </div>
 
                 <!-- Regrid Panel -->
-                <div id="regrid-panel">
+                <div id="regrid-panel" style="display: none;">
                     <div class="thead">
                         <div>
                             <div class="ttitle">🏠 Property Records</div>
@@ -1249,7 +1257,7 @@
                                     <th>Home Sqft</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="regrid-tbody">
                                 <tr>
                                     <td>Smith, John</td>
                                     <td>123 Main St</td>
@@ -1281,9 +1289,12 @@
             </div>
         </div>
 
+        <!-- Status -->
+        <div id="regrid-status" style="display: none;"></div>
+
         <!-- Shape Bar -->
         <div id="shape-bar">
-            <span style="color: var(--accent); font-weight: 600;">47 events selected</span>
+            <span id="shape-bar-count" style="color: var(--accent); font-weight: 600;">0 events selected</span>
             <button class="btn btn-ghost">🏠 PULL PROPERTY DATA</button>
             <button class="btn btn-ghost">⬇ CSV</button>
             <button class="btn btn-ghost">🏠 Property PDF</button>
@@ -1293,6 +1304,9 @@
         </div>
     </div>
 
+    <!-- Toast Notification -->
+    <div id="toast" style="position: fixed; bottom: 20px; left: 20px; background: var(--navy-mid); border: 1px solid var(--navy-border); border-radius: 8px; padding: 12px 16px; color: var(--text); font-size: 13px; z-index: 2000; opacity: 0; transition: opacity 0.3s; pointer-events: none;">Loading...</div>
+
     <!-- Canvass Modal -->
     <div id="canvass-modal" class="overlay">
         <div class="modal" style="position: relative;">
@@ -1301,30 +1315,30 @@
             <p>Select addresses or draw on the map to capture hail events</p>
 
             <div class="modal-tabs">
-                <button class="modal-tab active" data-pane="address">📍 By Address</button>
-                <button class="modal-tab" data-pane="draw">✏️ Draw on Map</button>
+                <button class="modal-tab active" id="canvass-tab-addr" data-pane="address">📍 By Address</button>
+                <button class="modal-tab" id="canvass-tab-draw" data-pane="draw">✏️ Draw on Map</button>
             </div>
 
             <!-- Address Pane -->
-            <div class="modal-pane active" id="pane-address">
+            <div class="modal-pane active" id="canvass-addr-pane">
                 <div class="mf">
                     <label>Address</label>
-                    <input type="text" placeholder="Enter address...">
+                    <input type="text" id="canvass-address" placeholder="Enter address...">
                 </div>
                 <div class="mf">
                     <label>Radius</label>
-                    <select>
-                        <option>25 miles</option>
-                        <option>50 miles</option>
-                        <option>75 miles</option>
-                        <option>100 miles</option>
+                    <select id="canvass-radius">
+                        <option value="25">25 miles</option>
+                        <option value="50">50 miles</option>
+                        <option value="75">75 miles</option>
+                        <option value="100">100 miles</option>
                     </select>
                 </div>
                 <button class="btn btn-green" style="width: 100%; justify-content: center; height: 36px;">🔍 Find Events</button>
             </div>
 
             <!-- Draw Pane -->
-            <div class="modal-pane" id="pane-draw">
+            <div class="modal-pane" id="canvass-draw-pane">
                 <p style="margin-bottom: 16px;">Use map tools to draw a circle or rectangle, then select the events within.</p>
                 <div class="mf">
                     <button class="btn btn-circle" style="width: 100%; justify-content: center; height: 36px;">⭕ Draw Circle</button>
@@ -1336,9 +1350,10 @@
             </div>
 
             <!-- Results Section -->
-            <div class="results-section">
+            <div id="canvass-results" class="results-section">
                 <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--navy-border);">
-                    <p style="margin-bottom: 12px;">📊 Results: <strong id="results-count">47 events</strong> found</p>
+                    <p style="margin-bottom: 12px;">📊 Results: <strong id="cr-total">47 events</strong> found <span id="cr-max" style="color: var(--text-dim);">Max: —</span></p>
+                    <div id="cr-tbody"></div>
                     <button class="btn btn-ghost" style="width: 100%; justify-content: center; height: 36px; margin-bottom: 8px;">⬇ Export as CSV</button>
                     <button class="btn btn-pdf" style="width: 100%; justify-content: center; height: 36px;">📄 Export as PDF</button>
                 </div>
@@ -1351,26 +1366,36 @@
     </div>
 
     <!-- CSV Export Modal -->
-    <div id="csv-overlay" class="overlay">
+    <div id="export-modal" class="overlay">
         <div class="modal" style="position: relative;">
-            <button class="close-btn">&times;</button>
+            <button class="close-btn" onclick="document.getElementById('export-modal').classList.remove('on')">&times;</button>
             <h3>⬇ Export CSV</h3>
             <p>A shape filter is active. Which events would you like to export?</p>
             <div class="macts">
-                <button class="btn btn-green" style="flex: 1; justify-content: center; height: 38px;">🗺 All Events</button>
-                <button class="btn btn-ghost" style="flex: 1; justify-content: center; height: 38px;">🔷 Selection Only</button>
+                <button class="btn btn-green" id="export-all-btn" style="flex: 1; justify-content: center; height: 38px;" onclick="doExport(dispEvents,'all')">🗺 All Events</button>
+                <button class="btn btn-ghost" id="export-selection-btn" style="flex: 1; justify-content: center; height: 38px;" onclick="doExport(window._shapeFiltered,'selection')">🔷 Selection Only</button>
             </div>
         </div>
     </div>
 
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB9SN4nDqsGbMG8oSOI4nkLgnNYamvTZms&libraries=visualization,geometry,drawing&callback=initMap" async defer></script>
     <script>
-        // Initialize dates
-        const today = new Date();
-        const twoDaysAgo = new Date(today);
-        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+        // Global variables
+        let gmap, heatmap, allEvents=[], dispEvents=[], fetching=false, zipLL=null;
+        let currentTier=1, sKey='date', sDir=-1;
+        let canvassCircle=null;
 
-        document.getElementById('start-date').valueAsDate = twoDaysAgo;
-        document.getElementById('end-date').valueAsDate = today;
+        // Initialize dates and UI
+        function setDefaultDates(){
+          const end=new Date();
+          const start=new Date();
+          start.setDate(start.getDate()-2);
+          document.getElementById('endDate').value=ymd(end);
+          document.getElementById('startDate').value=ymd(start);
+        }
+
+        // Init on load
+        window.addEventListener('load', setDefaultDates);
 
         // Login functionality
         document.getElementById('activate-btn').addEventListener('click', function() {
@@ -1378,25 +1403,22 @@
             const shell = document.getElementById('shell');
             const loginScreen = document.getElementById('login-screen');
 
-            if (licenseInput.value.trim()) {
+            if (licenseInput.value.trim().toUpperCase() === 'NPA') {
+                currentTier = 1;
                 loginScreen.classList.add('hidden');
                 shell.style.display = 'flex';
-
-                // Initialize map markers after shell is shown
-                setTimeout(initMapMarkers, 100);
+                setTimeout(()=>{if(gmap)google.maps.event.trigger(gmap,'resize');}, 100);
             } else {
-                document.getElementById('login-error').textContent = 'Please enter a license key';
+                document.getElementById('login-error').textContent = 'Invalid license key';
             }
         });
 
-        // Allow login with Enter key
         document.getElementById('license-input').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 document.getElementById('activate-btn').click();
             }
         });
 
-        // Logout functionality
         document.getElementById('tier-badge').addEventListener('click', function() {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('shell').style.display = 'none';
@@ -1404,153 +1426,452 @@
             document.getElementById('login-error').textContent = '';
         });
 
-        // Update button - show progress bar
-        document.getElementById('update-btn').addEventListener('click', function() {
-            const bar = document.getElementById('bar');
-            bar.classList.add('on');
-            setTimeout(() => bar.classList.remove('on'), 1500);
-        });
+        // Button handlers
+        document.getElementById('update-btn').addEventListener('click', fetchAndRender);
+        document.getElementById('reset-btn').addEventListener('click', resetAll);
+        document.getElementById('btn-draw-circle').addEventListener('click', ()=>setDrawMode('circle'));
+        document.getElementById('btn-draw-rect').addEventListener('click', ()=>setDrawMode('rectangle'));
+        document.getElementById('btn-draw-clear').addEventListener('click', clearDrawing);
+        document.getElementById('btn-melissa').addEventListener('click', melissaClick);
+        document.getElementById('ib-close').addEventListener('click', ()=>document.getElementById('info-box').style.display='none');
 
         // Canvass modal
         document.getElementById('canvass-btn').addEventListener('click', function() {
             document.getElementById('canvass-modal').classList.add('on');
         });
 
-        document.getElementById('modal-close').addEventListener('click', function() {
-            document.getElementById('canvass-modal').classList.remove('on');
-        });
-
-        // Modal tab switching
+        // Modal tabs
         document.querySelectorAll('.modal-tab').forEach(tab => {
             tab.addEventListener('click', function() {
-                const paneId = 'pane-' + this.dataset.pane;
-
+                const paneId = this.dataset.pane + '-pane';
+                if(paneId==='address-pane')paneId='canvass-addr-pane';
+                if(paneId==='draw-pane')paneId='canvass-draw-pane';
                 document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
                 document.querySelectorAll('.modal-pane').forEach(p => p.classList.remove('active'));
-
                 this.classList.add('active');
-                document.getElementById(paneId).classList.add('active');
+                const el=document.getElementById(paneId);
+                if(el)el.classList.add('active');
             });
         });
 
-        // Close modal with button
-        document.querySelectorAll('.modal .macts .btn-close').forEach(btn => {
+        document.querySelectorAll('.modal .macts .btn-close, #modal-close').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.getElementById('canvass-modal').classList.remove('on');
             });
         });
 
-        // CSV Export modal close
-        document.querySelectorAll('#csv-overlay .close-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.getElementById('csv-overlay').classList.remove('on');
+        // Table header sorting
+        document.querySelectorAll('th').forEach((th,i) => {
+            th.style.cursor='pointer';
+            th.addEventListener('click', ()=>{
+                const keys=['date','city','size','daysAgo','county','zip'];
+                sKey=keys[i];
+                sDir=-sDir;
+                renderTableData(dispEvents);
             });
         });
 
-        // Mobile tabs functionality
-        const mobileTabs = document.querySelectorAll('#mobile-tabs .btn');
-        if (mobileTabs.length > 0) {
-            mobileTabs[0].addEventListener('click', function() {
-                document.getElementById('map-wrap').style.display = 'flex';
-                document.getElementById('sidebar').style.display = 'none';
-                mobileTabs[0].classList.add('active');
-                mobileTabs[1].classList.remove('active');
-            });
-
-            mobileTabs[1].addEventListener('click', function() {
-                document.getElementById('map-wrap').style.display = 'none';
-                document.getElementById('sidebar').style.display = 'flex';
-                mobileTabs[1].classList.add('active');
-                mobileTabs[0].classList.remove('active');
-            });
-        }
-
-        // Map markers
-        function initMapMarkers() {
-            const map = document.getElementById('map');
-            const markers = [
-                { x: 15, y: 25, size: 8, color: '#22c55e' },
-                { x: 35, y: 40, size: 10, color: '#84cc16' },
-                { x: 55, y: 30, size: 12, color: '#eab308' },
-                { x: 72, y: 55, size: 14, color: '#f97316' },
-                { x: 25, y: 65, size: 10, color: '#22c55e' },
-                { x: 80, y: 20, size: 8, color: '#84cc16' },
-                { x: 45, y: 75, size: 12, color: '#eab308' },
-                { x: 65, y: 50, size: 10, color: '#f97316' }
-            ];
-
-            markers.forEach(marker => {
-                const dot = document.createElement('div');
-                dot.className = 'map-marker';
-                dot.style.left = marker.x + '%';
-                dot.style.top = marker.y + '%';
-                dot.style.width = marker.size + 'px';
-                dot.style.height = marker.size + 'px';
-                dot.style.background = marker.color;
-                dot.style.boxShadow = `0 0 ${marker.size * 1.5}px ${marker.color}80`;
-                map.appendChild(dot);
-            });
-        }
-
-        // Table row click interaction
-        document.querySelectorAll('#storm-table .erow').forEach(row => {
-            row.addEventListener('click', function() {
-                const infoBox = document.getElementById('info-box');
-                infoBox.style.display = 'block';
-
-                // Show info for clicked row
-                const cells = this.querySelectorAll('td');
-                if (cells.length >= 5) {
-                    const date = cells[0].textContent;
-                    const city = cells[1].textContent;
-                    const size = cells[2].textContent;
-                    const county = cells[4].textContent;
-
-                    infoBox.querySelector('[style*="Date"]') ? null : null;
-                    infoBox.innerHTML = `
-                        <div style="font-family: 'Bebas Neue', sans-serif; font-size: 14px; letter-spacing: 1px; margin-bottom: 6px;">STORM EVENT</div>
-                        <div style="font-size: 12px; color: var(--text); margin-bottom: 4px;">Date: ${date}</div>
-                        <div style="font-size: 12px; color: var(--text); margin-bottom: 4px;">City: ${city}</div>
-                        <div style="font-size: 12px; color: var(--text-muted);">Hail: ${size} | County: ${county}</div>
-                    `;
-                }
-            });
+        // Quick search
+        document.getElementById('qsearch').addEventListener('keyup', function() {
+            const q=this.value.toLowerCase();
+            const filtered=dispEvents.filter(e=>(e.city+e.county).toLowerCase().includes(q));
+            renderTableData(filtered);
         });
 
-        // Reset button
-        document.getElementById('reset-btn').addEventListener('click', function() {
-            document.getElementById('start-date').valueAsDate = twoDaysAgo;
-            document.getElementById('end-date').valueAsDate = today;
-            document.getElementById('min-hail').value = '1';
-            document.getElementById('state-select').value = 'All States';
-            document.getElementById('event-type').value = 'Hail';
-        });
-
-        // Stats demo
-        function updateStats() {
-            const eventRows = document.querySelectorAll('#storm-table .erow');
-            const eventCount = eventRows.length;
-
-            let maxHail = 0;
-            let insCount = 0;
-
-            eventRows.forEach(row => {
-                const sizeText = row.querySelector('td:nth-child(3)').textContent;
-                const size = parseFloat(sizeText);
-                if (size > maxHail) maxHail = size;
-                if (size >= 1.75) insCount++;
+        // Utility Functions
+        function dayList(s,e){const codes=[];const cur=new Date(s.replace(/-/g,'/')+' 00:00:00');const end=new Date(e.replace(/-/g,'/')+' 00:00:00');while(cur<=end){const yy=cur.getFullYear().toString().slice(-2);const mm=String(cur.getMonth()+1).padStart(2,'0');const dd=String(cur.getDate()).padStart(2,'0');codes.push(yy+mm+dd);cur.setDate(cur.getDate()+1);}return codes;}
+        function fixCoord(v,isLon){let s=(v||'').toString().trim();if(!s)return null;if(!s.includes('.'))s=s.length===4?s.slice(0,2)+'.'+s.slice(2):s.slice(0,3)+'.'+s.slice(3);const n=parseFloat(s);return isNaN(n)?null:(isLon&&n>0?-n:n);}
+        function hc(s){return s>=6?'#a855f7':s>=3.5?'#ef4444':s>=2.5?'#f97316':s>=1.75?'#eab308':s>=1.0?'#84cc16':'#22c55e';}
+        function cc(s){return s>=6?'c-6':s>=3.5?'c-5':s>=2.5?'c-4':s>=1.75?'c-3':s>=1.0?'c-2':'c-1';}
+        function ac(d){return d<=7?'age-f':d<=30?'age-h':d<=90?'age-w':'age-c';}
+        function al(d){return d===0?'Today 🔥':d===1?'1d ago 🔥':d<=7?d+'d ago 🔥':d+'d ago';}
+        function rc(s){return s>=6?'row-6':s>=3.5?'row-5':s>=2.5?'row-4':s>=1.75?'row-3':s>=1.0?'row-2':'row-1';}
+        function x(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+        function ymd(d){return d.toISOString().split('T')[0]}
+        function renderTable(){renderTableData(dispEvents);}
+        function haversine(la1,lo1,la2,lo2){const R=3958.8,dL=(la2-la1)*Math.PI/180,dO=(lo2-lo1)*Math.PI/180;const a=Math.sin(dL/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dO/2)**2;return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));}
+        function hl(s){return s>=6?'Severe ⚡':s>=3.5?'Major Claim':s>=2.5?'Insurance Claim ✓':s>=1.75?'Ins. Threshold':s>=1.0?'Moderate':'Minor';}
+        function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),3500);}
+        function loading(on){document.getElementById('bar').classList.toggle('on',on);}
+        function updateStats(){
+          document.getElementById('sv-total').textContent=dispEvents.length||'—';
+          const max=dispEvents.reduce((m,e)=>Math.max(m,e.size),0);
+          document.getElementById('sv-max').textContent=max?max+'"':'—';
+          document.getElementById('sv-ins').textContent=dispEvents.filter(e=>e.size>=1.75).length||'—';
+        }
+        function applyRadius(){
+          const radMi=parseFloat(document.getElementById('radius').value)||0;
+          dispEvents=(zipLL&&radMi)?allEvents.filter(e=>haversine(zipLL.lat,zipLL.lng,e.lat,e.lng)<=radMi):[...allEvents];
+          renderMap();
+          renderTable();
+          updateStats();
+        }
+        async function geoZip(zip){
+          if(!window._geocoder)window._geocoder=new google.maps.Geocoder();
+          return new Promise(resolve=>{
+            window._geocoder.geocode({address:zip},(results,status)=>{
+              if(status===google.maps.GeocoderStatus.OK&&results&&results[0]){const l=results[0].geometry.location;resolve({lat:l.lat(),lng:l.lng()});}
+              else{resolve(null);}
             });
-
-            document.getElementById('stat-events').textContent = eventCount;
-            document.getElementById('stat-max-hail').textContent = maxHail.toFixed(2) + '"';
-            document.getElementById('stat-ins').textContent = insCount;
+          });
+        }
+        function fly(e){
+          gmap.panTo({lat:e.lat,lng:e.lng});gmap.setZoom(11);
+          document.getElementById('ib-city').textContent=e.city+', '+e.state;
+          document.getElementById('ib-sub').textContent=e.county+' County · '+e.date;
+          document.getElementById('ib-size').style.color=hc(e.size);
+          document.getElementById('ib-size').textContent=e.size+'"  '+hl(e.size);
+          document.getElementById('ib-ago').textContent=al(e.daysAgo);
+          document.getElementById('info-box').style.display='block';
+        }
+        function setChromeHeight(){
+          if(screen.width<=900||document.documentElement.clientWidth<=900){
+            if(gmap)google.maps.event.trigger(gmap,'resize');
+            return;
+          }
+          const wrap=document.getElementById('map-wrap');
+          const mapEl=document.getElementById('map');
+          if(!wrap||!mapEl)return;
+          const rect=wrap.getBoundingClientRect();
+          const mapH=Math.max(window.innerHeight-rect.top,300);
+          wrap.style.height=mapH+'px';
+          mapEl.style.height=mapH+'px';
+          if(gmap)google.maps.event.trigger(gmap,'resize');
+        }
+        function resetAll(){
+          setDefaultDates();
+          document.getElementById('minHail').value='1';
+          document.getElementById('stateFilter').value='';
+          document.getElementById('eventType').value='hail';
+          document.getElementById('zipCode').value='';
+          document.getElementById('radius').value='';
+          document.getElementById('qsearch').value='';
+          document.getElementById('shape-bar').style.display='none';
+          if(window._clearShape)window._clearShape();
+          if(canvassCircle){canvassCircle.setMap(null);canvassCircle=null;}
+          fetchAndRender();
+        }
+        function exportCSV(){
+          if(!dispEvents.length){toast('⚠️ No data to export.');return;}
+          if(window._shapeFiltered&&window._shapeFiltered.length>0){
+            document.getElementById('export-all-btn').textContent='🗺 All Events ('+dispEvents.length+')';
+            document.getElementById('export-selection-btn').textContent='🔷 Selection Only ('+window._shapeFiltered.length+')';
+            document.getElementById('export-modal').classList.add('on');
+          }else{doExport(dispEvents,'all');}
+        }
+        function doExport(events,label){
+          if(!events||!events.length){toast('⚠️ No data to export.');return;}
+          const h=['Date','City','State','County','Zip','Hail Size (in)','Days Ago','Lat','Lng'];
+          const r=events.map(e=>[e.date,e.city,e.state,e.county,e.zip||'',e.size,e.daysAgo,e.lat,e.lng]);
+          const csv=[h,...r].map(row=>row.map(v=>'"'+v+'"').join(',')).join('\n');
+          const a=document.createElement('a');
+          a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+          a.download='storm-sniper-'+label+'-'+ymd(new Date())+'.csv';
+          a.click();
+          document.getElementById('export-modal').classList.remove('on');
+          toast('✅ '+events.length+' events exported!');
+        }
+        async function lookupZipCodes(events){
+          if(!window._zipCache)window._zipCache={};
+          if(!window._geocoder)window._geocoder=new google.maps.Geocoder();
+          for(let i=0;i<events.length;i++){
+            const e=events[i];
+            if(e.zip)continue;
+            const key=e.lat.toFixed(3)+','+e.lng.toFixed(3);
+            if(window._zipCache[key]){
+              const zip=window._zipCache[key];
+              allEvents.forEach(a=>{if(a.lat.toFixed(3)===e.lat.toFixed(3)&&a.lng.toFixed(3)===e.lng.toFixed(3))a.zip=zip;});
+              dispEvents.forEach(a=>{if(a.lat.toFixed(3)===e.lat.toFixed(3)&&a.lng.toFixed(3)===e.lng.toFixed(3))a.zip=zip;});
+              continue;
+            }
+            let retry=false;
+            await new Promise(resolve=>{
+              window._geocoder.geocode({location:{lat:e.lat,lng:e.lng}},(results,status)=>{
+                if(status===google.maps.GeocoderStatus.OK&&results&&results.length>0){
+                  for(const result of results){
+                    const zipComp=result.address_components.find(c=>c.types.includes('postal_code'));
+                    if(zipComp){
+                      const zip=zipComp.long_name;
+                      window._zipCache[key]=zip;
+                      allEvents.forEach(a=>{if(a.lat.toFixed(3)===e.lat.toFixed(3)&&a.lng.toFixed(3)===e.lng.toFixed(3))a.zip=zip;});
+                      dispEvents.forEach(a=>{if(a.lat.toFixed(3)===e.lat.toFixed(3)&&a.lng.toFixed(3)===e.lng.toFixed(3))a.zip=zip;});
+                      break;
+                    }
+                  }
+                }else if(status===google.maps.GeocoderStatus.OVER_QUERY_LIMIT){retry=true;}
+                resolve();
+              });
+            });
+            if(retry){await new Promise(r=>setTimeout(r,2000));i--;continue;}
+            if(i%5===0)renderTableData(dispEvents);
+            await new Promise(r=>setTimeout(r,80));
+          }
+          renderTableData(dispEvents);
+        }
+        function mobileTab(tab){
+          const mapWrap=document.getElementById('map-wrap');
+          const sidebar=document.getElementById('sidebar');
+          const tabMap=document.getElementById('tab-map');
+          const tabData=document.getElementById('tab-data');
+          if(!mapWrap||!sidebar)return;
+          if(tab==='map'){
+            mapWrap.style.display='';sidebar.style.display='none';
+            tabMap.classList.add('tab-active');tabData.classList.remove('tab-active');
+            setTimeout(()=>{if(gmap)google.maps.event.trigger(gmap,'resize');},100);
+          }else{
+            mapWrap.style.display='none';sidebar.style.display='flex';
+            tabMap.classList.remove('tab-active');tabData.classList.add('tab-active');
+          }
+        }
+        function regridClick(){
+          if(currentTier>=2){toast('🏠 Property Records coming soon.');}
+          else{toast('🔒 Upgrade to Tier 2 to access property data.');}
+        }
+        function melissaClick(){
+          if(currentTier>=3){toast('📞 Melissa integration coming soon!');}
+          else{toast('🔒 Upgrade to Tier 3 to get email & phone contacts.');}
         }
 
-        // Initialize stats
-        updateStats();
+        // Core fetch & render
+        async function fetchAndRender(){
+          if(fetching)return;
+          fetching=true;
+          loading(true);
+          const start=document.getElementById('startDate').value;
+          const end=document.getElementById('endDate').value;
+          const minSz=parseFloat(document.getElementById('minHail').value)||1.0;
+          const state=document.getElementById('stateFilter').value.toUpperCase();
+          const etype=document.getElementById('eventType').value;
+          const zip=document.getElementById('zipCode').value.trim();
+          const radMi=parseFloat(document.getElementById('radius').value)||0;
+          if(!start||!end){toast('⚠️ Please set a start and end date.');loading(false);fetching=false;return;}
+          zipLL=null;
+          if(zip&&radMi){
+            zipLL=await geoZip(zip);
+            if(!zipLL){toast('⚠️ Could not find that zip code.');loading(false);fetching=false;return;}
+          }
+          const days=dayList(start,end);
+          const today=new Date();today.setHours(0,0,0,0);
+          document.getElementById('badge').textContent='Fetching...';
+          const results=await Promise.allSettled(days.map(d=>fetchDay(d,etype,minSz,state,today)));
+          const raw=results.flatMap(r=>r.status==='fulfilled'?r.value:[]);
+          allEvents=raw;
+          applyRadius();
+          fetching=false;
+          loading(false);
+          toast('✅ '+dispEvents.length+' events loaded');
+          lookupZipCodes(allEvents);
+        }
 
-        // Prevent login screen from being hidden on initial load
-        // Wait for DOMContentLoaded to ensure login screen is visible
+        async function fetchDay(code,etype,minSz,state,today){
+          const spcUrl='https://www.spc.noaa.gov/climo/reports/'+code+'_rpts_'+etype+'.csv';
+          const proxies=[
+            'https://api.allorigins.win/raw?url='+encodeURIComponent(spcUrl),
+            'https://corsproxy.io/?'+encodeURIComponent(spcUrl),
+            'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(spcUrl),
+            'https://cors.eu.org/'+spcUrl,
+            'https://thingproxy.freeboard.io/fetch/'+spcUrl,
+          ];
+          for(const p of proxies){
+            try{
+              const ctrl=new AbortController();
+              const t=setTimeout(()=>ctrl.abort(),8000);
+              const res=await fetch(p,{signal:ctrl.signal});
+              clearTimeout(t);
+              if(!res.ok)continue;
+              const txt=await res.text();
+              if(!txt||txt.trim().length<10||txt.trim().startsWith('<'))continue;
+              return parseCSV(txt,code,etype,minSz,state,today);
+            }catch(e){continue;}
+          }
+          return[];
+        }
+
+        function parseCSV(txt,code,etype,minSz,state,today){
+          const lines=txt.trim().split('\n');
+          const out=[];
+          const yy=parseInt(code.slice(0,2)),mm=parseInt(code.slice(2,4))-1,dd=parseInt(code.slice(4,6));
+          const yr=yy+(yy<=30?2000:1900);
+          const evDate=new Date(yr,mm,dd);
+          const daysAgo=Math.floor((today-evDate)/86400000);
+          const dateStr=evDate.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit',year:'2-digit'});
+          for(let i=1;i<lines.length;i++){
+            const c=lines[i].split(',');
+            if(c.length<7)continue;
+            const size=etype==='hail'?parseInt(c[1])/100:(parseInt(c[1])||0);
+            if(etype==='hail'&&size<minSz)continue;
+            const st=(c[4]||'').trim().toUpperCase();
+            if(state&&st!==state)continue;
+            const city=(c[2]||'').trim().replace(/\b\w/g,l=>l.toUpperCase()).toLowerCase().replace(/\b\w/g,l=>l.toUpperCase());
+            const county=(c[3]||'').trim();
+            const lat=fixCoord(c[5],false);
+            const lng=fixCoord(c[6],true);
+            if(!lat||!lng||isNaN(lat)||isNaN(lng))continue;
+            out.push({date:dateStr,code,city,county,state:st,size,lat,lng,daysAgo,type:etype,zip:''});
+          }
+          return out;
+        }
+
+        function renderTableData(events){
+          const tbody=document.getElementById('tbody');
+          document.getElementById('badge').textContent=events.length+' events';
+          if(!events.length){tbody.innerHTML='<tr><td colspan="6"><div class="empty"><div class="ei">🔍</div><p>No events match your filters.</p></div></td></tr>';return;}
+          const sorted=[...events].sort((a,b)=>{let av=a[sKey],bv=b[sKey];if(typeof av==='string'){av=av.toLowerCase();bv=bv.toLowerCase();}return av<bv?-sDir:av>bv?sDir:0;});
+          tbody.innerHTML=sorted.map((e,i)=>`<tr class="erow ${rc(e.size)}" data-i="${i}"><td style="font-family:'JetBrains Mono',monospace;font-size:11px">${e.date}</td><td><span class="cn">${x(e.city)}</span> <span class="cs">${e.state}</span></td><td><span class="chip ${cc(e.size)}">${e.size}"</span></td><td><span class="${ac(e.daysAgo)}">${al(e.daysAgo)}</span></td><td style="color:var(--text-dim);font-size:11px">${x(e.county)}</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-dim)">${e.zip||'—'}</td></tr>`).join('');
+          tbody._data=sorted;
+          tbody.querySelectorAll('.erow').forEach(row=>{row.addEventListener('click',()=>fly(tbody._data[+row.dataset.i]));});
+        }
+
+        function renderMap(){
+          if(!gmap)return;
+          if(heatmap)heatmap.setMap(null);
+          if(window._freshMarkers)window._freshMarkers.forEach(m=>m.setMap(null));
+          window._freshMarkers=[];
+          if(!dispEvents.length)return;
+          heatmap=new google.maps.visualization.HeatmapLayer({
+            data:dispEvents.map(e=>({
+              location:new google.maps.LatLng(e.lat,e.lng),
+              weight:e.size>=6?12:e.size>=3.5?9:e.size>=2.5?7:e.size>=1.75?5:e.size>=1.0?3:1,
+            })),
+            map:gmap,radius:40,opacity:0.85,maxIntensity:15,
+            gradient:['rgba(0,0,0,0)','rgba(34,197,94,0.6)','rgba(132,204,22,0.75)','rgba(234,179,8,0.85)','rgba(249,115,22,0.9)','rgba(239,68,68,0.95)','rgba(168,85,247,1)'],
+          });
+          dispEvents.forEach(e=>{
+            const scale=e.size>=6?1.4:e.size>=3.5?1.2:e.size>=2.5?1.0:e.size>=1.75?0.85:0.7;
+            const color=hc(e.size);
+            const marker=new google.maps.Marker({
+              position:{lat:e.lat,lng:e.lng},map:gmap,
+              icon:{url:'data:image/svg+xml;charset=UTF-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="32" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12c0 9 12 20 12 20S24 21 24 12C24 5.37 18.63 0 12 0z" fill="'+color+'" stroke="white" stroke-width="1.5"/><circle cx="12" cy="12" r="4" fill="white" opacity="0.9"/></svg>'),scaledSize:new google.maps.Size(24*scale,32*scale),anchor:new google.maps.Point(12*scale,32*scale)},
+              title:e.city+', '+e.state+' — '+e.size+'" — '+al(e.daysAgo),zIndex:20,
+            });
+            marker.addListener('click',()=>fly(e));
+            window._freshMarkers.push(marker);
+          });
+          google.maps.event.trigger(gmap,'resize');
+          if(zipLL&&parseFloat(document.getElementById('radius').value)){
+            gmap.setCenter(zipLL);gmap.setZoom(9);
+          }else{
+            const bounds=new google.maps.LatLngBounds();
+            dispEvents.forEach(e=>bounds.extend({lat:e.lat,lng:e.lng}));
+            gmap.fitBounds(bounds,{top:30,right:30,bottom:30,left:30});
+            google.maps.event.addListenerOnce(gmap,'bounds_changed',()=>{if(gmap.getZoom()>9)gmap.setZoom(9);});
+          }
+        }
+
+        function filterByShape(shape,type){
+          if(!allEvents.length)return;
+          const source=allEvents.filter(e=>{
+            const minSz=parseFloat(document.getElementById('minHail').value)||1.0;
+            const state=document.getElementById('stateFilter').value.toUpperCase();
+            if(e.size<minSz)return false;
+            if(state&&e.state!==state)return false;
+            return true;
+          });
+          const shapeType=type||(shape.getRadius!==undefined?'circle':'rectangle');
+          let filtered;
+          if(shapeType===google.maps.drawing.OverlayType.CIRCLE||shapeType==='circle'){
+            const center=shape.getCenter();
+            const radius=shape.getRadius();
+            filtered=source.filter(e=>{
+              const pt=new google.maps.LatLng(e.lat,e.lng);
+              return google.maps.geometry.spherical.computeDistanceBetween(center,pt)<=radius;
+            });
+          }else{
+            const bounds=shape.getBounds();
+            filtered=source.filter(e=>bounds.contains(new google.maps.LatLng(e.lat,e.lng)));
+          }
+          dispEvents=filtered;
+          renderTableData(filtered);
+          window._shapeFiltered=filtered;
+          document.getElementById('canvass-modal').classList.remove('on');
+          const bar=document.getElementById('shape-bar');
+          document.getElementById('shape-bar-count').textContent=filtered.length;
+          bar.style.display='flex';
+          toast('🔷 '+filtered.length+' events inside shape');
+        }
+
+        // Map init
+        function initMap(){
+          gmap=new google.maps.Map(document.getElementById('map'),{
+            zoom:4,center:{lat:39.82,lng:-98.57},mapTypeId:'roadmap',
+            streetViewControl:true,fullscreenControl:true,gestureHandling:'greedy',
+            styles:[
+              {elementType:'geometry',stylers:[{color:'#e8ecf0'}]},
+              {elementType:'labels.text.fill',stylers:[{color:'#4a5568'}]},
+              {elementType:'labels.text.stroke',stylers:[{color:'#ffffff'}]},
+              {featureType:'administrative.country',elementType:'geometry.stroke',stylers:[{color:'#a0aec0'}]},
+              {featureType:'administrative.province',elementType:'geometry.stroke',stylers:[{color:'#b0bec5'}]},
+              {featureType:'road',elementType:'geometry',stylers:[{color:'#ffffff'}]},
+              {featureType:'road.highway',elementType:'geometry',stylers:[{color:'#f6c90e'},{lightness:60}]},
+              {featureType:'water',elementType:'geometry',stylers:[{color:'#aed6f1'}]},
+              {featureType:'landscape',elementType:'geometry',stylers:[{color:'#edf2f7'}]},
+              {featureType:'poi',stylers:[{visibility:'off'}]},
+              {featureType:'transit',stylers:[{visibility:'off'}]},
+            ],
+          });
+          google.maps.event.addListenerOnce(gmap,'idle',()=>{
+            setChromeHeight();
+            google.maps.event.trigger(gmap,'resize');
+            fetchAndRender();
+          });
+          let activeShape=null;
+          const dm=new google.maps.drawing.DrawingManager({
+            drawingMode:null,drawingControl:false,
+            circleOptions:{fillColor:'#0d1b2a',fillOpacity:0.08,strokeColor:'#0d1b2a',strokeWeight:2,clickable:false,editable:true,zIndex:1},
+            rectangleOptions:{fillColor:'#0d1b2a',fillOpacity:0.08,strokeColor:'#0d1b2a',strokeWeight:2,clickable:false,editable:true,zIndex:1},
+          });
+          dm.setMap(gmap);
+          window.setDrawMode=function(mode){
+            dm.setDrawingMode(mode==='circle'?google.maps.drawing.OverlayType.CIRCLE:google.maps.drawing.OverlayType.RECTANGLE);
+            document.getElementById('btn-draw-circle').classList.toggle('active',mode==='circle');
+            document.getElementById('btn-draw-rect').classList.toggle('active',mode==='rectangle');
+          };
+          window.clearDrawing=function(){
+            if(activeShape){activeShape.setMap(null);activeShape=null;window._shapeFiltered=null;}
+            window._activeShape=null;window._activeShapeType=null;
+            window._regridParcels=[];window._regridOffsetId=null;
+            document.getElementById('regrid-panel').style.display='none';
+            document.getElementById('regrid-status').style.display='none';
+            dm.setDrawingMode(null);
+            document.getElementById('btn-draw-circle').classList.remove('active');
+            document.getElementById('btn-draw-rect').classList.remove('active');
+            document.getElementById('btn-draw-clear').style.display='none';
+            document.getElementById('shape-bar').style.display='none';
+            renderTable();
+            toast('🗑 Drawing cleared');
+          };
+          google.maps.event.addListener(dm,'overlaycomplete',function(ev){
+            if(activeShape)activeShape.setMap(null);
+            activeShape=ev.overlay;
+            window._activeShape=activeShape;
+            window._activeShapeType=ev.type;
+            filterByShape(activeShape,ev.type);
+            const refilt=()=>filterByShape(activeShape,ev.type);
+            google.maps.event.addListener(activeShape,'bounds_changed',refilt);
+            google.maps.event.addListener(activeShape,'radius_changed',refilt);
+            google.maps.event.addListener(activeShape,'center_changed',refilt);
+            dm.setDrawingMode(null);
+            document.getElementById('btn-draw-circle').classList.remove('active');
+            document.getElementById('btn-draw-rect').classList.remove('active');
+            document.getElementById('btn-draw-clear').style.display='';
+          });
+          window._dm=dm;
+          window._clearShape=()=>{if(window.clearDrawing)window.clearDrawing();};
+        }
+
+        // CSS for toast animation
+        const style=document.createElement('style');
+        style.textContent=`#toast.on { opacity: 1; pointer-events: auto; animation: fadeInOut 3s ease-in-out; }
+        @keyframes fadeInOut { 0%,100%{opacity:0} 50%{opacity:1} }
+        .chip { padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; font-family: 'JetBrains Mono', monospace; }
+        .c-1 { background: rgba(34,197,94,0.2); color: #22c55e; }
+        .c-2 { background: rgba(132,204,22,0.2); color: #84cc16; }
+        .c-3 { background: rgba(234,179,8,0.2); color: #eab308; }
+        .c-4 { background: rgba(249,115,22,0.2); color: #f97316; }
+        .c-5 { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .c-6 { background: rgba(168,85,247,0.2); color: #a855f7; }
+        .tab-active { background: var(--navy-light); }`;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
