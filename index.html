@@ -1,1 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storm Sniper | Hail Intelligence Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Bebas+Neue&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --navy: #0d1b2a;
+            --navy-mid: #132236;
+            --navy-light: #1a2f47;
+            --navy-border: #1e3a56;
+            --green: #22c55e;
+            --green-dark: #16a34a;
+            --orange: #f97316;
+            --orange-dark: #ea6c0a;
+            --yellow: #eab308;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --accent: #38bdf8;
+        }
 
+        *,*::before,*::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: var(--navy);
+            font-family: 'DM Sans', sans-serif;
+            color: var(--text);
+        }
+
+        #shell {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: var(--navy);
+            padding-top: 120px;
+            overflow: hidden;
+        }
+
+        #hdr {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            background: linear-gradient(135deg, #0a1520, var(--navy-mid));
+            border-bottom: 1px solid var(--navy-border);
+            padding: 10px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .logo-text {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 24px;
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo-sub {
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        #hdr > div:nth-child(2) {
+            flex: 1;
+            text-align: center;
+        }
+
+        #hdr > div:nth-child(2) > div:first-child {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: var(--text-muted);
+        }
+
+        #hdr > div:nth-child(2) > div:last-child {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .hdr-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            background: var(--navy-light);
+            border: 1px solid var(--navy-border);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 13px;
+            color: var(--accent);
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        #bar {
+            position: fixed;
+            top: 57px;
+            left: 0;
+            right: 0;
+            z-index: 199;
+            height: 3px;
+            background: var(--navy-border);
+            overflow: hidden;
+        }
+
+        #bar.on::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+            animation: sweep 1.2s infinite;
+        }
+
+        @keyframes sweep {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        #ctrl {
+            position: fixed;
+            top: 60px;
+            left: 0;
+            right: 0;
+            z-index: 198;
+            background: var(--navy-mid);
+            border-bottom: 1px solid var(--navy-border);
+            padding: 10px 14px;
+        }
+
+        .crow {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: flex-end;
+            width: 100%;
+        }
+
+        .crow + .crow {
+            margin-top: 8px;
+        }
+
+        .fld {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .fld label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .fld input,
+        .fld select {
+            background: var(--navy);
+            border: 1px solid var(--navy-border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            padding: 7px 10px;
+            min-width: 0;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 7px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            transition: 0.15s;
+            white-space: nowrap;
+        }
+
+        .btn-green {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-green:hover {
+            background: var(--green-dark);
+        }
+
+        .btn-orange {
+            background: var(--orange);
+            color: #fff;
+        }
+
+        .btn-orange:hover {
+            background: var(--orange-dark);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--navy-border);
+            color: var(--text);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-pdf {
+            background: #6366f1;
+            color: #fff;
+        }
+
+        .btn-pdf:hover {
+            background: #4f46e5;
+        }
+
+        .btn-canvass {
+            background: var(--accent);
+            color: var(--navy);
+        }
+
+        .btn-canvass:hover {
+            background: #7dd3fc;
+        }
+
+        .btn-ins {
+            background: var(--yellow);
+            color: var(--navy);
+            font-weight: 700;
+        }
+
+        .btn-ins:hover {
+            background: #ca8a04;
+            color: #fff;
+        }
+
+        .btn-circle {
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .btn-circle:hover {
+            background: var(--accent);
+            color: var(--navy);
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid #ef4444;
+            color: #ef4444;
+        }
+
+        .btn-clear:hover {
+            background: #ef4444;
+            color: #fff;
+        }
+
+        #main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        #map-wrap {
+            flex: 1;
+            position: relative;
+            min-width: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            position: relative;
+            overflow: hidden;
+        }
+
+        .legend {
+            position: absolute;
+            bottom: 12px;
+            left: 12px;
+            background: rgba(13, 27, 42, 0.88);
+            border: 1px solid var(--navy-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 10;
+            backdrop-filter: blur(8px);
+        }
+
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .leg-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        #info-box {
+            display: none;
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy-mid);
+            border: 1px solid var(--navy-border);
+            border-radius: 10px;
+            padding: 14px 18px;
+            min-width: 240px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            z-index: 20;
+        }
+
+        #sidebar {
+            width: 420px;
+            min-width: 340px;
+            max-width: 50vw;
+            background: var(--navy-mid);
+            border-left: 1px solid var(--navy-border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .stats {
+            display: flex;
+            border-bottom: 1px solid var(--navy-border);
+        }
+
+        .stat {
+            flex: 1;
+            text-align: center;
+            padding: 12px 6px;
+            border-right: 1px solid var(--navy-border);
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat-v {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .stat-l {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .tpanel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .thead {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 14px;
+            border-bottom: 1px solid var(--navy-border);
+        }
+
+        .ttitle {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .thint {
+            font-size: 10px;
+            color: var(--text-dim);
+        }
+
+        .tscroll {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 8px 12px;
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            background: var(--navy-light);
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            border-bottom: 1px solid var(--navy-border);
+        }
+
+        td {
+            padding: 8px 12px;
+            font-size: 12px;
+            border-bottom: 1px solid rgba(30, 58, 86, 0.3);
+            color: var(--text-muted);
+        }
+
+        .row-1 td { background: #0d2818 !important; border-bottom: 1px solid #22c55e33; }
+        .row-2 td { background: #1a2e0d !important; border-bottom: 1px solid #84cc1633; }
+        .row-3 td { background: #2a2500 !important; border-bottom: 1px solid #eab30833; }
+        .row-4 td { background: #2a1a0a !important; border-bottom: 1px solid #f9731633; }
+        .row-5 td { background: #3a0f0f !important; border-bottom: 1px solid #ef444433; }
+        .row-6 td { background: #2a0f3a !important; border-bottom: 1px solid #a855f733; }
+
+        .row-1 td:first-child { border-left: 3px solid #22c55e; }
+        .row-2 td:first-child { border-left: 3px solid #84cc16; }
+        .row-3 td:first-child { border-left: 3px solid #eab308; }
+        .row-4 td:first-child { border-left: 3px solid #f97316; }
+        .row-5 td:first-child { border-left: 3px solid #ef4444; }
+        .row-6 td:first-child { border-left: 3px solid #a855f7; }
+
+        .erow:hover td {
+            filter: brightness(1.3);
+            cursor: pointer;
+        }
+
+        .age-f { color: #ef4444; font-weight: 700; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .age-h { color: #f97316; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .age-w { color: #eab308; font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+        .age-c { color: var(--text-dim); font-family: 'JetBrains Mono', monospace; font-size: 11px; }
+
+        .empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-dim);
+            font-size: 13px;
+        }
+
+        #login-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--navy);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #login-screen.hidden {
+            display: none;
+        }
+
+        .login-box {
+            background: var(--navy-mid);
+            border: 1px solid var(--navy-border);
+            border-radius: 16px;
+            padding: 40px;
+            width: 420px;
+            max-width: 92vw;
+            box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .login-logo {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 36px;
+            letter-spacing: 4px;
+            background: linear-gradient(90deg, #fff, var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-sub {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .login-box input {
+            width: 100%;
+            background: var(--navy);
+            border: 1px solid var(--navy-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            padding: 12px 14px;
+            text-align: center;
+            letter-spacing: 2px;
+            margin-bottom: 14px;
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--accent), #0ea5e9);
+            color: var(--navy);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 18px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-bottom: 14px;
+        }
+
+        .login-box button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.3);
+        }
+
+        .tier-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 6px;
+        }
+
+        .tier-card {
+            background: var(--navy-light);
+            border: 1px solid var(--navy-border);
+            border-radius: 8px;
+            padding: 10px 8px;
+            text-align: center;
+        }
+
+        .tier-label {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: var(--accent);
+        }
+
+        .tier-desc {
+            font-size: 9px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        #login-error {
+            color: #ef4444;
+            font-size: 11px;
+            margin-bottom: 14px;
+            min-height: 14px;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overlay.on {
+            display: flex;
+        }
+
+        .modal {
+            background: var(--navy-mid);
+            border: 1px solid var(--navy-border);
+            border-radius: 12px;
+            padding: 26px;
+            width: 400px;
+            max-width: 92vw;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin-bottom: 5px;
+            color: var(--yellow);
+        }
+
+        .modal p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+
+        .modal-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 18px;
+            border-bottom: 1px solid var(--navy-border);
+        }
+
+        .modal-tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 12px;
+            border-bottom: 2px solid transparent;
+            transition: 0.15s;
+        }
+
+        .modal-tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        .modal-pane {
+            display: none;
+        }
+
+        .modal-pane.active {
+            display: block;
+        }
+
+        .mf {
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .mf label {
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .mf input, .mf select {
+            background: var(--navy);
+            border: 1px solid var(--navy-border);
+            border-radius: 6px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            padding: 7px 10px;
+        }
+
+        .macts {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .macts .btn {
+            flex: 1;
+            justify-content: center;
+            height: 38px;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: var(--navy);
+        }
+
+        .btn-close {
+            background: transparent;
+            border: 1px solid var(--navy-border);
+            color: var(--text);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.15s;
+        }
+
+        .close-btn:hover {
+            color: var(--accent);
+        }
+
+        #toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--navy-mid);
+            border: 1px solid var(--navy-border);
+            color: var(--text);
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 12px;
+            z-index: 5000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        #toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="login-screen">
+        <div class="login-box">
+            <div class="login-logo">STORM SNIPER</div>
+            <div class="login-sub">Hail Intelligence Platform</div>
+            <input type="password" id="license-input" placeholder="ENTER LICENSE KEY" />
+            <button id="activate-btn">ACTIVATE</button>
+            <div id="login-error"></div>
+            <div class="tier-grid">
+                <div class="tier-card">
+                    <div class="tier-label">TIER 1</div>
+                    <div class="tier-desc">Full Access</div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-label">TIER 2</div>
+                    <div class="tier-desc">Limited</div>
+                </div>
+                <div class="tier-card">
+                    <div class="tier-label">TIER 3</div>
+                    <div class="tier-desc">Preview</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="shell" style="display: none;">
+        <div id="hdr">
+            <div>
+                <div class="logo-text">STORM SNIPER</div>
+                <div class="logo-sub">Intelligence</div>
+            </div>
+            <div>
+                <div>GOLDMINE-DATA.COM</div>
+                <div>HIGH INTENT MARKETING</div>
+            </div>
+            <div class="hdr-right">
+                <div class="badge" id="tier-badge">TIER 1</div>
+            </div>
+        </div>
+
+        <div id="bar"></div>
+
+        <div id="ctrl">
+            <div class="crow">
+                <div class="fld" style="min-width: 120px;">
+                    <label>Start Date</label>
+                    <input type="date" id="start-date" />
+                </div>
+                <div class="fld" style="min-width: 120px;">
+                    <label>End Date</label>
+                    <input type="date" id="end-date" />
+                </div>
+                <div class="fld" style="min-width: 100px;">
+                    <label>Min Hail</label>
+                    <input type="number" id="min-hail" value="1" step="0.1" />
+                </div>
+                <div class="fld" style="min-width: 120px;">
+                    <label>State</label>
+                    <select id="state-select">
+                        <option>All States</option>
+                        <option>Kansas</option>
+                        <option>Oklahoma</option>
+                        <option>Colorado</option>
+                        <option>Nebraska</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="crow">
+                <div class="fld" style="min-width: 120px;">
+                    <label>Event Type</label>
+                    <select id="event-type">
+                        <option>Hail</option>
+                        <option>Tornado</option>
+                        <option>Wind</option>
+                    </select>
+                </div>
+                <div class="fld" style="min-width: 120px;">
+                    <label>Zip Code</label>
+                    <input type="text" id="zip-code" placeholder="Enter zip" />
+                </div>
+                <div class="fld" style="min-width: 100px;">
+                    <label>Radius (mi)</label>
+                    <input type="number" id="radius" value="25" />
+                </div>
+            </div>
+
+            <div class="crow">
+                <button class="btn btn-green" id="update-btn">⚡ UPDATE</button>
+                <button class="btn btn-ghost" id="reset-btn">↺ RESET</button>
+                <button class="btn btn-ins" id="ins-btn">🛡 INS+</button>
+                <button class="btn btn-ghost" id="csv-btn">⬇ CSV</button>
+                <button class="btn btn-pdf" id="report-btn">📄 REPORT</button>
+                <button class="btn btn-canvass" id="canvass-btn">🚪 CANVASS</button>
+                <button class="btn btn-circle" id="circle-btn">⭕ CIRCLE</button>
+                <button class="btn btn-circle" id="rect-btn">▭ RECT</button>
+                <button class="btn btn-clear" id="clear-btn">✕ CLEAR</button>
+            </div>
+        </div>
+
+        <div id="main">
+            <div id="map-wrap">
+                <div id="map"></div>
+                <div id="info-box"></div>
+                <div class="legend">
+                    <div class="leg-item">
+                        <div class="leg-dot" style="background: #22c55e;"></div>
+                        <span>&lt;1"</span>
+                    </div>
+                    <div class="leg-item">
+                        <div class="leg-dot" style="background: #84cc16;"></div>
+                        <span>1-1.5"</span>
+                    </div>
+                    <div class="leg-item">
+                        <div class="leg-dot" style="background: #eab308;"></div>
+                        <span>1.5-2"</span>
+                    </div>
+                    <div class="leg-item">
+                        <div class="leg-dot" style="background: #f97316;"></div>
+                        <span>2-2.75"</span>
+                    </div>
+                    <div class="leg-item">
+                        <div class="leg-dot" style="background: #ef4444;"></div>
+                        <span>&gt;2.75"</span>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sidebar">
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-v" id="stat-events">0</div>
+                        <div class="stat-l">EVENTS</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-v" id="stat-max-hail">0"</div>
+                        <div class="stat-l">MAX HAIL</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-v" id="stat-ins">0</div>
+                        <div class="stat-l">INSURABLE</div>
+                    </div>
+                </div>
+
+                <div class="tpanel">
+                    <div class="thead">
+                        <div class="ttitle">EVENTS</div>
+                        <div class="thint" id="event-count">0 found</div>
+                    </div>
+                    <div class="tscroll">
+                        <table id="storm-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>City</th>
+                                    <th>Size</th>
+                                    <th>Age</th>
+                                    <th>County</th>
+                                    <th>Zip</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                        <div class="empty">No events loaded. Click UPDATE to fetch data.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="canvass-modal" class="overlay">
+        <div class="modal">
+            <button class="close-btn" id="modal-close">&times;</button>
+            <h3>CANVASS INTEL</h3>
+            <p>Target homeowners with recent hail damage for property assessment services.</p>
+
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-pane="routes">Routes</button>
+                <button class="modal-tab" data-pane="leads">Leads</button>
+                <button class="modal-tab" data-pane="export">Export</button>
+            </div>
+
+            <div class="modal-pane active" id="pane-routes">
+                <div class="mf">
+                    <label>Route Generator</label>
+                    <p style="color: var(--text-dim); font-size: 11px;">Create optimized walking routes through hail-affected neighborhoods.</p>
+                </div>
+                <div class="mf">
+                    <label>Route Radius (mi)</label>
+                    <input type="number" value="1" />
+                </div>
+                <div class="mf">
+                    <label>Max Homes per Route</label>
+                    <input type="number" value="50" />
+                </div>
+                <div class="macts">
+                    <button class="btn btn-save">GENERATE</button>
+                    <button class="btn btn-close">CLOSE</button>
+                </div>
+            </div>
+
+            <div class="modal-pane" id="pane-leads">
+                <div class="mf">
+                    <label>Lead Filters</label>
+                    <p style="color: var(--text-dim); font-size: 11px;">Narrow down prospect list by demographics.</p>
+                </div>
+                <div class="mf">
+                    <label>Min Hail Size</label>
+                    <input type="number" value="1.75" step="0.1" />
+                </div>
+                <div class="mf">
+                    <label>Days Since Event</label>
+                    <input type="number" value="30" />
+                </div>
+                <div class="macts">
+                    <button class="btn btn-save">FILTER</button>
+                    <button class="btn btn-close">CLOSE</button>
+                </div>
+            </div>
+
+            <div class="modal-pane" id="pane-export">
+                <div class="mf">
+                    <label>Export Options</label>
+                    <p style="color: var(--text-dim); font-size: 11px;">Export lead data for CRM integration.</p>
+                </div>
+                <div class="mf">
+                    <label>Format</label>
+                    <select>
+                        <option>CSV</option>
+                        <option>Excel</option>
+                        <option>Google Sheets</option>
+                    </select>
+                </div>
+                <div class="macts">
+                    <button class="btn btn-save">EXPORT</button>
+                    <button class="btn btn-close">CLOSE</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast"></div>
+
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCSUo3Gw28CJ0pXX1Qo4yAv7xpi6DECR3s&libraries=drawing,visualization"></script>
+    <script>
+        let allEvents = [];
+        let map = null;
+        let heatmapLayer = null;
+        let markers = [];
+
+        function dayList(s, e) {
+            const days = [];
+            for (let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
+                const yy = String(d.getFullYear()).slice(-2);
+                const mm = String(d.getMonth() + 1).padStart(2, '0');
+                const dd = String(d.getDate()).padStart(2, '0');
+                days.push(yy + mm + dd);
+            }
+            return days;
+        }
+
+        function fixCoord(v, isLon) {
+            if (!v) return null;
+            v = String(v).trim();
+            let num = parseFloat(v);
+            if (isNaN(num)) return null;
+            if (isLon && num > 0) num = -num;
+            if (!isLon && num < 0) num = -num;
+            return num;
+        }
+
+        function hc(s) {
+            if (s < 1) return '#22c55e';
+            if (s < 1.5) return '#84cc16';
+            if (s < 2) return '#eab308';
+            if (s < 2.75) return '#f97316';
+            return '#ef4444';
+        }
+
+        function cc(s) {
+            if (s < 1) return 'row-1';
+            if (s < 1.5) return 'row-2';
+            if (s < 2) return 'row-3';
+            if (s < 2.75) return 'row-4';
+            if (s < 4) return 'row-5';
+            return 'row-6';
+        }
+
+        function ac(d) {
+            if (d === 0) return 'age-f';
+            if (d === 1) return 'age-f';
+            if (d <= 7) return 'age-h';
+            if (d <= 30) return 'age-w';
+            return 'age-c';
+        }
+
+        function al(d) {
+            if (d === 0) return 'fresh';
+            if (d === 1) return '1d ago';
+            if (d <= 7) return d + 'd ago';
+            if (d <= 30) return Math.floor(d/7) + 'w ago';
+            return Math.floor(d/30) + 'm ago';
+        }
+
+        function x(s) {
+            const div = document.createElement('div');
+            div.textContent = s;
+            return div.innerHTML;
+        }
+
+        function ymd(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return y + '-' + m + '-' + dd;
+        }
+
+        function toast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        const today = new Date();
+        const twoDaysAgo = new Date(today);
+        twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+        document.getElementById('start-date').valueAsDate = twoDaysAgo;
+        document.getElementById('end-date').valueAsDate = today;
+
+        document.getElementById('activate-btn').addEventListener('click', function() {
+            const licenseInput = document.getElementById('license-input');
+            const key = licenseInput.value.trim().toUpperCase();
+
+            if (key === 'NPA') {
+                window.currentTier = 2;
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('shell').style.display = 'flex';
+                document.getElementById('tier-badge').textContent = 'Tier 2';
+                initMap();
+            } else {
+                document.getElementById('login-error').textContent = 'Invalid license key';
+            }
+        });
+
+        document.getElementById('license-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') document.getElementById('activate-btn').click();
+        });
+
+        document.getElementById('tier-badge').addEventListener('click', function() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('shell').style.display = 'none';
+            document.getElementById('license-input').value = '';
+            document.getElementById('login-error').textContent = '';
+        });
+
+        function initMap() {
+            const mapStyles = [
+                {elementType: 'geometry', stylers: [{color: '#0d1b2a'}]},
+                {elementType: 'labels.text.stroke', stylers: [{color: '#0d1b2a'}]},
+                {elementType: 'labels.text.fill', stylers: [{color: '#64748b'}]},
+                {featureType: 'road', elementType: 'geometry', stylers: [{color: '#1a2f47'}]},
+                {featureType: 'water', elementType: 'geometry', stylers: [{color: '#132236'}]},
+                {featureType: 'poi', stylers: [{visibility: 'off'}]}
+            ];
+
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: {lat: 39.82, lng: -98.57},
+                zoom: 4,
+                mapTypeControl: true,
+                styles: mapStyles,
+                streetViewControl: false
+            });
+
+            heatmapLayer = new google.maps.visualization.HeatmapLayer({
+                data: [],
+                map: map,
+                radius: 30,
+                opacity: 0.6
+            });
+        }
+
+        function parseCSV(txt, code, etype, minSz, state, today) {
+            const lines = txt.split('\n');
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i].trim();
+                if (!line) continue;
+                const parts = line.split(',').map(p => p.trim());
+                if (parts.length < 7) continue;
+
+                let lat = fixCoord(parts[4], false);
+                let lng = fixCoord(parts[5], true);
+                let size = parseFloat(parts[6]);
+
+                if (!lat || !lng || isNaN(size)) continue;
+                if (size < minSz) continue;
+
+                const city = parts[0] || '';
+                const st = parts[1] || '';
+                const county = parts[2] || '';
+                const eventDate = '20' + code.substring(0,2) + '-' + code.substring(2,4) + '-' + code.substring(4,6);
+                const daysAgo = Math.floor((new Date(today) - new Date(eventDate)) / (1000*60*60*24));
+
+                allEvents.push({city, state: st, county, lat, lng, size, date: eventDate, daysAgo, zip: ''});
+            }
+        }
+
+        async function fetchDay(code, etype, minSz, state, today) {
+            const baseUrl = `https://www.spc.noaa.gov/climo/reports/${code}_rpts_filtered_${etype}.csv`;
+            const proxies = [
+                url => `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`,
+                url => `https://corsproxy.io/?${encodeURIComponent(url)}`,
+                url => `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
+            ];
+
+            for (const makeUrl of proxies) {
+                try {
+                    const res = await fetch(makeUrl(baseUrl));
+                    if (!res.ok) continue;
+                    const txt = await res.text();
+                    if (txt && txt.length > 10) {
+                        parseCSV(txt, code, etype, minSz, state, today);
+                        return true;
+                    }
+                } catch(e) { continue; }
+            }
+            return false;
+        }
+
+        async function fetchAndRender() {
+            allEvents = [];
+            const startDate = new Date(document.getElementById('start-date').value);
+            const endDate = new Date(document.getElementById('end-date').value);
+            const minSz = parseFloat(document.getElementById('min-hail').value) || 1;
+            const state = document.getElementById('state-select').value;
+            const etype = document.getElementById('event-type').value === 'Hail' ? 'hail' : 'torn';
+
+            const bar = document.getElementById('bar');
+            bar.classList.add('on');
+
+            const codes = dayList(startDate, endDate);
+            let fetched = 0;
+            for (const code of codes) {
+                if (await fetchDay(code, etype, minSz, state, new Date())) {
+                    fetched++;
+                }
+            }
+
+            bar.classList.remove('on');
+            renderMap();
+            renderTable();
+            updateStats();
+            toast(`Fetched ${fetched} days, ${allEvents.length} events`);
+        }
+
+        function renderMap() {
+            markers.forEach(m => m.setMap(null));
+            markers = [];
+
+            const heatData = [];
+            const bounds = new google.maps.LatLngBounds();
+
+            allEvents.forEach(e => {
+                const pt = {lat: e.lat, lng: e.lng};
+                heatData.push(pt);
+                bounds.extend(pt);
+
+                const marker = new google.maps.Marker({
+                    position: pt,
+                    map: map,
+                    icon: {
+                        path: google.maps.SymbolPath.CIRCLE,
+                        scale: Math.max(3, e.size * 2),
+                        fillColor: hc(e.size),
+                        fillOpacity: 0.7,
+                        strokeColor: '#fff',
+                        strokeWeight: 0.5
+                    },
+                    title: `${e.city}, ${e.state} - ${e.size}"`
+                });
+                markers.push(marker);
+            });
+
+            heatmapLayer.setData(heatData);
+            if (heatData.length > 0) {
+                map.fitBounds(bounds);
+            }
+        }
+
+        function renderTable() {
+            const tbody = document.querySelector('#storm-table tbody');
+            tbody.innerHTML = '';
+
+            allEvents.forEach(e => {
+                const row = document.createElement('tr');
+                row.className = 'erow ' + cc(e.size);
+                row.innerHTML = `
+                    <td>${e.date}</td>
+                    <td>${x(e.city)}</td>
+                    <td>${e.size.toFixed(2)}"</td>
+                    <td class="${ac(e.daysAgo)}">${al(e.daysAgo)}</td>
+                    <td>${x(e.county)}</td>
+                    <td>${e.zip || '-'}</td>
+                `;
+                row.addEventListener('click', () => {
+                    const infoBox = document.getElementById('info-box');
+                    infoBox.innerHTML = `<div style="font-family: Bebas Neue; font-size: 14px; margin-bottom: 8px;">HAIL EVENT</div>
+                        <div style="font-size: 12px;">Date: ${e.date}</div>
+                        <div style="font-size: 12px;">City: ${e.city}, ${e.state}</div>
+                        <div style="font-size: 12px;">Size: ${e.size.toFixed(2)}" | County: ${e.county}</div>`;
+                    infoBox.style.display = 'block';
+                });
+                tbody.appendChild(row);
+            });
+
+            document.getElementById('event-count').textContent = allEvents.length + ' found';
+        }
+
+        function updateStats() {
+            const eventCount = allEvents.length;
+            const maxHail = allEvents.length > 0 ? Math.max(...allEvents.map(e => e.size)) : 0;
+            const insCount = allEvents.filter(e => e.size >= 1.75).length;
+
+            document.getElementById('stat-events').textContent = eventCount;
+            document.getElementById('stat-max-hail').textContent = maxHail.toFixed(2) + '"';
+            document.getElementById('stat-ins').textContent = insCount;
+        }
+
+        document.getElementById('update-btn').addEventListener('click', fetchAndRender);
+        document.getElementById('reset-btn').addEventListener('click', function() {
+            document.getElementById('start-date').valueAsDate = twoDaysAgo;
+            document.getElementById('end-date').valueAsDate = today;
+            document.getElementById('min-hail').value = '1';
+            document.getElementById('state-select').value = 'All States';
+            document.getElementById('event-type').value = 'Hail';
+        });
+
+        document.getElementById('ins-btn').addEventListener('click', function() {
+            document.getElementById('min-hail').value = '1.75';
+            toast('Filter set to insurance threshold (1.75")');
+        });
+
+        document.getElementById('csv-btn').addEventListener('click', function() {
+            if (allEvents.length === 0) {
+                toast('No events to export');
+                return;
+            }
+            const csv = 'Date,City,State,County,Size,Latitude,Longitude\n' +
+                allEvents.map(e => `${e.date},${e.city},${e.state},${e.county},${e.size},${e.lat},${e.lng}`).join('\n');
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'hail_events.csv';
+            a.click();
+            toast('CSV exported');
+        });
+
+        document.getElementById('report-btn').addEventListener('click', function() {
+            toast('PDF Report coming soon');
+        });
+
+        document.getElementById('canvass-btn').addEventListener('click', function() {
+            document.getElementById('canvass-modal').classList.add('on');
+        });
+
+        document.getElementById('circle-btn').addEventListener('click', function() {
+            toast('Circle drawing mode active');
+        });
+
+        document.getElementById('rect-btn').addEventListener('click', function() {
+            toast('Rectangle drawing mode active');
+        });
+
+        document.getElementById('clear-btn').addEventListener('click', function() {
+            toast('Drawing cleared');
+        });
+
+        document.getElementById('modal-close').addEventListener('click', function() {
+            document.getElementById('canvass-modal').classList.remove('on');
+        });
+
+        document.querySelectorAll('.modal-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.modal-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.modal-pane').forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById('pane-' + this.dataset.pane).classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.modal .macts .btn-close').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.getElementById('canvass-modal').classList.remove('on');
+            });
+        });
+    </script>
+</body>
+</html>
