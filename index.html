@@ -1153,16 +1153,18 @@
                 const parts = line.split(',').map(p => p.trim());
                 if (parts.length < 7) continue;
 
-                let lat = fixCoord(parts[4], false);
-                let lng = fixCoord(parts[5], true);
-                let size = parseFloat(parts[6]);
+                // CSV: Time,Size,Location,County,State,Lat,Lon,Comments
+                let lat = parseFloat(parts[5]);
+                let lng = parseFloat(parts[6]);
+                let rawSize = parseFloat(parts[1]);
+                let size = rawSize > 10 ? rawSize / 100 : rawSize; // SPC uses hundredths (100=1.00")
 
                 if (!lat || !lng || isNaN(size)) continue;
                 if (size < minSz) continue;
 
-                const city = parts[0] || '';
-                const st = parts[1] || '';
-                const county = parts[2] || '';
+                const city = parts[2] || '';
+                const st = parts[4] || '';
+                const county = parts[3] || '';
                 const eventDate = '20' + code.substring(0,2) + '-' + code.substring(2,4) + '-' + code.substring(4,6);
                 const daysAgo = Math.floor((new Date(today) - new Date(eventDate)) / (1000*60*60*24));
 
@@ -1198,7 +1200,8 @@
             const endDate = new Date(document.getElementById('end-date').value);
             const minSz = parseFloat(document.getElementById('min-hail').value) || 1;
             const state = document.getElementById('state-select').value;
-            const etype = document.getElementById('event-type').value === 'Hail' ? 'hail' : 'torn';
+            const etypeVal = document.getElementById('event-type').value;
+            const etype = etypeVal === 'Wind' ? 'wind' : etypeVal === 'Tornado' ? 'torn' : 'hail';
 
             const bar = document.getElementById('bar');
             bar.classList.add('on');
