@@ -1153,7 +1153,7 @@
                 window.currentTier = 2;
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('shell').style.display = 'flex';
-                document.getElementById('tier-badge').textContent = 'Tier 2';
+                document.getElementById('event-count').textContent = '0 events';
                 initMap();
             } else {
                 document.getElementById('login-error').textContent = 'Invalid license key';
@@ -1164,7 +1164,7 @@
             if (e.key === 'Enter') document.getElementById('activate-btn').click();
         });
 
-        document.getElementById('tier-badge').addEventListener('click', function() {
+        document.getElementById('event-count').addEventListener('click', function() {
             document.getElementById('login-screen').classList.remove('hidden');
             document.getElementById('shell').style.display = 'none';
             document.getElementById('license-input').value = '';
@@ -1404,10 +1404,6 @@
 
         document.getElementById('rect-btn').addEventListener('click', function() {
             toast('Rectangle drawing mode active');
-        });
-
-        document.getElementById('clear-btn').addEventListener('click', function() {
-            toast('Drawing cleared');
         });
 
         document.getElementById('modal-close').addEventListener('click', function() {
