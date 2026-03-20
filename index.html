@@ -46,7 +46,7 @@
             top: 0;
             left: 0;
             background: var(--navy);
-            padding-top: 120px;
+            padding-top: 115px;
             overflow: hidden;
         }
 
@@ -91,7 +91,38 @@
             font-family: 'Bebas Neue', sans-serif;
             font-size: 14px;
             letter-spacing: 4px;
-            color: var(--text-muted);
+            color: #eab308;
+        }
+
+        .heat-toggle {
+            position: relative;
+            display: inline-block;
+            width: 36px;
+            height: 20px;
+            cursor: pointer;
+        }
+        .heat-toggle input { display: none; }
+        .toggle-slider {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--navy-border);
+            border-radius: 10px;
+            transition: 0.3s;
+        }
+        .toggle-slider::after {
+            content: '';
+            position: absolute;
+            width: 16px; height: 16px;
+            left: 2px; top: 2px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        .heat-toggle input:checked + .toggle-slider {
+            background: var(--accent);
+        }
+        .heat-toggle input:checked + .toggle-slider::after {
+            left: 18px;
         }
 
         #hdr > div:nth-child(2) > div:last-child {
@@ -321,6 +352,17 @@
             align-items: center;
             z-index: 10;
             backdrop-filter: blur(8px);
+            flex-wrap: wrap;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 3px;
         }
 
         .leg-item {
@@ -796,15 +838,13 @@
         <div id="hdr">
             <div>
                 <div class="logo-text">STORM SNIPER</div>
-                <div class="logo-sub">Intelligence</div>
+                <div class="logo-sub">HAIL INTELLIGENCE PLATFORM</div>
             </div>
             <div>
-                <div>GOLDMINE-DATA.COM</div>
-                <div>HIGH INTENT MARKETING</div>
+                <div>HIGH INTENT MARKETING INTELLIGENCE</div>
+                <div>GOLDMINE-DATA.COM · 888-739-1128</div>
             </div>
-            <div class="hdr-right">
-                <div class="badge" id="tier-badge">TIER 1</div>
-            </div>
+            <div class="hdr-right"><span class="badge" id="event-count">0 events</span><label class="heat-toggle"><input type="checkbox" id="heat-check" checked><span class="toggle-slider"></span></label></div>
         </div>
 
         <div id="bar"></div>
@@ -820,22 +860,26 @@
                     <input type="date" id="end-date" />
                 </div>
                 <div class="fld" style="min-width: 100px;">
-                    <label>Min Hail</label>
+                    <label>Min Hail (in)</label>
                     <input type="number" id="min-hail" value="1" step="0.1" />
                 </div>
-                <div class="fld" style="min-width: 120px;">
+                <div class="fld" style="min-width: 110px;">
                     <label>State</label>
                     <select id="state-select">
-                        <option>All States</option>
-                        <option>Kansas</option>
-                        <option>Oklahoma</option>
-                        <option>Colorado</option>
-                        <option>Nebraska</option>
+                        <option value="All States">All States</option>
+                        <option>AL</option><option>AR</option><option>AZ</option>
+                        <option>CO</option><option>FL</option><option>GA</option>
+                        <option>IA</option><option>IL</option><option>IN</option>
+                        <option>KS</option><option>KY</option><option>LA</option>
+                        <option>MI</option><option>MN</option><option>MO</option>
+                        <option>MS</option><option>MT</option><option>NC</option>
+                        <option>ND</option><option>NE</option><option>NM</option>
+                        <option>OH</option><option>OK</option><option>SC</option>
+                        <option>SD</option><option>TN</option><option>TX</option>
+                        <option>VA</option><option>WI</option><option>WV</option>
+                        <option>WY</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="crow">
                 <div class="fld" style="min-width: 120px;">
                     <label>Event Type</label>
                     <select id="event-type">
@@ -844,26 +888,36 @@
                         <option>Wind</option>
                     </select>
                 </div>
-                <div class="fld" style="min-width: 120px;">
+                <div class="fld" style="min-width: 110px;">
                     <label>Zip Code</label>
                     <input type="text" id="zip-code" placeholder="Enter zip" />
                 </div>
-                <div class="fld" style="min-width: 100px;">
-                    <label>Radius (mi)</label>
-                    <input type="number" id="radius" value="25" />
+                <div class="fld" style="min-width: 110px;">
+                    <label>Radius</label>
+                    <select id="radius-select">
+                        <option value="0" selected>None</option>
+                        <option value="25">25 mi</option>
+                        <option value="50">50 mi</option>
+                        <option value="75">75 mi</option>
+                        <option value="100">100 mi</option>
+                        <option value="150">150 mi</option>
+                    </select>
                 </div>
             </div>
 
             <div class="crow">
+                <div class="fld">
+                    <label>Search City / County</label>
+                    <input type="text" id="table-filter" placeholder="Filter table..." style="width:130px;">
+                </div>
                 <button class="btn btn-green" id="update-btn">⚡ UPDATE</button>
                 <button class="btn btn-ghost" id="reset-btn">↺ RESET</button>
-                <button class="btn btn-ins" id="ins-btn">🛡 INS+</button>
+                <button class="btn btn-ins" id="ins-btn">🛡 Ins+</button>
                 <button class="btn btn-ghost" id="csv-btn">⬇ CSV</button>
-                <button class="btn btn-pdf" id="report-btn">📄 REPORT</button>
-                <button class="btn btn-canvass" id="canvass-btn">🚪 CANVASS</button>
-                <button class="btn btn-circle" id="circle-btn">⭕ CIRCLE</button>
-                <button class="btn btn-circle" id="rect-btn">▭ RECT</button>
-                <button class="btn btn-clear" id="clear-btn">✕ CLEAR</button>
+                <button class="btn btn-pdf" id="report-btn">📄 Report</button>
+                <button class="btn btn-canvass" id="canvass-btn">🚪 Canvass</button>
+                <button class="btn btn-circle" id="circle-btn">⭕ Circle</button>
+                <button class="btn btn-circle" id="rect-btn">▭ Rect</button>
             </div>
         </div>
 
@@ -871,27 +925,14 @@
             <div id="map-wrap">
                 <div id="map"></div>
                 <div id="info-box"></div>
-                <div class="legend">
-                    <div class="leg-item">
-                        <div class="leg-dot" style="background: #22c55e;"></div>
-                        <span>&lt;1"</span>
-                    </div>
-                    <div class="leg-item">
-                        <div class="leg-dot" style="background: #84cc16;"></div>
-                        <span>1-1.5"</span>
-                    </div>
-                    <div class="leg-item">
-                        <div class="leg-dot" style="background: #eab308;"></div>
-                        <span>1.5-2"</span>
-                    </div>
-                    <div class="leg-item">
-                        <div class="leg-dot" style="background: #f97316;"></div>
-                        <span>2-2.75"</span>
-                    </div>
-                    <div class="leg-item">
-                        <div class="leg-dot" style="background: #ef4444;"></div>
-                        <span>&gt;2.75"</span>
-                    </div>
+                <div id="legend" class="legend">
+                    <span class="legend-dot" style="background:#22c55e;"></span>.25–1"
+                    <span class="legend-dot" style="background:#84cc16;"></span>1–1.75"
+                    <span class="legend-dot" style="background:#eab308;"></span>1.75–2.5"
+                    <span class="legend-dot" style="background:#f97316;"></span>2.5–3.5"
+                    <span class="legend-dot" style="background:#ef4444;"></span>3.5–5"
+                    <span class="legend-dot" style="background:#a855f7;"></span>6"+
+                    <span class="legend-dot" style="background:radial-gradient(circle, #ef4444, #22c55e);"></span>Heatmap
                 </div>
             </div>
 
@@ -912,13 +953,13 @@
                 </div>
 
                 <div class="tpanel">
-                    <div class="thead">
-                        <div class="ttitle">EVENTS</div>
-                        <div class="thint" id="event-count">0 found</div>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;padding:8px 12px;">
+                        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text);">STORM EVENTS</div>
+                        <div style="font-size:11px;color:var(--text-dim);">Click row → fly to map</div>
                     </div>
                     <div class="tscroll">
                         <table id="storm-table">
-                            <thead>
+                            <thead id="storm-thead">
                                 <tr>
                                     <th>Date</th>
                                     <th>City</th>
@@ -1040,20 +1081,21 @@
         }
 
         function hc(s) {
-            if (s < 1) return '#22c55e';
-            if (s < 1.5) return '#84cc16';
-            if (s < 2) return '#eab308';
-            if (s < 2.75) return '#f97316';
-            return '#ef4444';
+            if (s >= 6) return '#a855f7';
+            if (s >= 3.5) return '#ef4444';
+            if (s >= 2.5) return '#f97316';
+            if (s >= 1.75) return '#eab308';
+            if (s >= 1) return '#84cc16';
+            return '#22c55e';
         }
 
         function cc(s) {
-            if (s < 1) return 'row-1';
-            if (s < 1.5) return 'row-2';
-            if (s < 2) return 'row-3';
-            if (s < 2.75) return 'row-4';
-            if (s < 4) return 'row-5';
-            return 'row-6';
+            if (s >= 6) return 'sz-6';
+            if (s >= 3.5) return 'sz-35';
+            if (s >= 2.5) return 'sz-25';
+            if (s >= 1.75) return 'sz-175';
+            if (s >= 1) return 'sz-1';
+            return 'sz-025';
         }
 
         function ac(d) {
@@ -1218,10 +1260,11 @@
 
             const codes = dayList(startDate, endDate);
             let fetched = 0;
-            for (const code of codes) {
-                if (await fetchDay(code, etype, minSz, state, new Date())) {
-                    fetched++;
-                }
+            const BATCH = 5;
+            for (let i = 0; i < codes.length; i += BATCH) {
+                const batch = codes.slice(i, i + BATCH);
+                const results = await Promise.all(batch.map(code => fetchDay(code, etype, minSz, state, new Date())));
+                fetched += results.filter(Boolean).length;
             }
 
             bar.classList.remove('on');
@@ -1383,6 +1426,43 @@
         document.querySelectorAll('.modal .macts .btn-close').forEach(btn => {
             btn.addEventListener('click', function() {
                 document.getElementById('canvass-modal').classList.remove('on');
+            });
+        });
+
+        // Heatmap toggle
+        document.getElementById('heat-check').addEventListener('change', function() {
+            if (this.checked) {
+                heatmapLayer.setMap(map);
+            } else {
+                heatmapLayer.setMap(null);
+            }
+        });
+
+        // Table filter
+        document.getElementById('table-filter').addEventListener('input', function() {
+            const q = this.value.toLowerCase();
+            const rows = document.getElementById('storm-table').querySelectorAll('tbody tr');
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(q) ? '' : 'none';
+            });
+        });
+
+        // Table sort
+        let sortCol = -1, sortAsc = true;
+        document.querySelectorAll('#storm-thead th').forEach((th, i) => {
+            th.style.cursor = 'pointer';
+            th.addEventListener('click', () => {
+                if (sortCol === i) { sortAsc = !sortAsc; } else { sortCol = i; sortAsc = true; }
+                const tbody = document.getElementById('storm-table').querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                rows.sort((a, b) => {
+                    let va = a.children[i].textContent.trim();
+                    let vb = b.children[i].textContent.trim();
+                    let na = parseFloat(va), nb = parseFloat(vb);
+                    if (!isNaN(na) && !isNaN(nb)) return sortAsc ? na - nb : nb - na;
+                    return sortAsc ? va.localeCompare(vb) : vb.localeCompare(va);
+                });
+                rows.forEach(r => tbody.appendChild(r));
             });
         });
     </script>
