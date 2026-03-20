@@ -1240,7 +1240,7 @@
 
             allEvents.forEach(e => {
                 const pt = {lat: e.lat, lng: e.lng};
-                heatData.push(pt);
+                heatData.push(new google.maps.LatLng(e.lat, e.lng));
                 bounds.extend(pt);
 
                 const marker = new google.maps.Marker({
