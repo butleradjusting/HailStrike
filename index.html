@@ -538,6 +538,12 @@
             text-align: center;
             letter-spacing: 2px;
             margin-bottom: 14px;
+            outline: none;
+        }
+
+        .login-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.15);
         }
 
         .login-box button {
@@ -545,8 +551,8 @@
             padding: 12px;
             border: none;
             border-radius: 8px;
-            background: linear-gradient(135deg, var(--accent), #0ea5e9);
-            color: var(--navy);
+            background: linear-gradient(135deg, var(--green), var(--green-dark));
+            color: #fff;
             font-family: 'Bebas Neue', sans-serif;
             font-size: 18px;
             letter-spacing: 3px;
@@ -557,7 +563,7 @@
 
         .login-box button:hover {
             transform: translateY(-1px);
-            box-shadow: 0 8px 24px rgba(56, 189, 248, 0.3);
+            box-shadow: 0 8px 24px rgba(34, 197, 94, 0.3);
         }
 
         .tier-grid {
@@ -766,21 +772,21 @@
         <div class="login-box">
             <div class="login-logo">STORM SNIPER</div>
             <div class="login-sub">Hail Intelligence Platform</div>
-            <input type="password" id="license-input" placeholder="ENTER LICENSE KEY" />
-            <button id="activate-btn">ACTIVATE</button>
+            <input type="text" id="license-input" placeholder="ENTER LICENSE KEY" autocomplete="off" />
+            <button id="activate-btn">⚡ ACTIVATE</button>
             <div id="login-error"></div>
             <div class="tier-grid">
                 <div class="tier-card">
-                    <div class="tier-label">TIER 1</div>
-                    <div class="tier-desc">Full Access</div>
+                    <div class="tier-label" style="color:#eab308;">⚡ TIER 1</div>
+                    <div class="tier-desc">Storm data, maps, CSV &amp; PDF reports</div>
                 </div>
                 <div class="tier-card">
-                    <div class="tier-label">TIER 2</div>
-                    <div class="tier-desc">Limited</div>
+                    <div class="tier-label" style="color:#f97316;">🏠 TIER 2</div>
+                    <div class="tier-desc">+ Property records via Regrid</div>
                 </div>
                 <div class="tier-card">
-                    <div class="tier-label">TIER 3</div>
-                    <div class="tier-desc">Preview</div>
+                    <div class="tier-label" style="color:#a855f7;">📞 TIER 3</div>
+                    <div class="tier-desc">+ Email &amp; phone via Melissa</div>
                 </div>
             </div>
         </div>
@@ -1066,6 +1072,10 @@
             return Math.floor(d/30) + 'm ago';
         }
 
+        function hl(s) {
+            return s>=6?'Severe ⚡':s>=3.5?'Major Claim':s>=2.5?'Insurance Claim ✓':s>=1.75?'Ins. Threshold':s>=1.0?'Moderate':'Minor';
+        }
+
         function x(s) {
             const div = document.createElement('div');
             div.textContent = s;
@@ -1246,6 +1256,19 @@
                     },
                     title: `${e.city}, ${e.state} - ${e.size}"`
                 });
+                google.maps.event.addListener(marker, 'click', function() {
+                    map.setZoom(10);
+                    map.panTo(pt);
+                    const infoBox = document.getElementById('info-box');
+                    infoBox.style.display = 'block';
+                    infoBox.innerHTML = `
+                        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;margin-bottom:6px;color:var(--text);">STORM EVENT</div>
+                        <div style="font-size:13px;color:var(--text);margin-bottom:4px;">${x(e.city)}, ${e.state}</div>
+                        <div style="font-size:12px;color:var(--text-muted);margin-bottom:4px;">${e.date} · ${e.county} County</div>
+                        <div style="font-size:14px;font-weight:700;color:${hc(e.size)};margin-bottom:4px;">${e.size.toFixed(2)}" Hail — ${hl(e.size)}</div>
+                        <div style="font-size:11px;color:var(--text-dim);">${al(e.daysAgo)}</div>
+                        <div style="position:absolute;top:6px;right:8px;cursor:pointer;color:var(--text-dim);font-size:16px;" onclick="this.parentElement.style.display='none'">✕</div>`;
+                });
                 markers.push(marker);
             });
 
@@ -1256,7 +1279,7 @@
         }
 
         function renderTable() {
-            const tbody = document.querySelector('#storm-table tbody');
+            const tbody = document.getElementById('storm-table');
             tbody.innerHTML = '';
 
             allEvents.forEach(e => {
